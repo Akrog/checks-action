@@ -3,8 +3,8 @@ import {Octokit} from '@octokit/rest';
 export type Args = {
   name: string;
   token: string;
-  conclusion: Conclusion;
-  status: Status;
+  conclusion?: Conclusion;
+  status?: Status;
 
   actionURL: string;
 

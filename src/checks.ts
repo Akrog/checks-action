@@ -21,13 +21,13 @@ const unpackInputs = (inputs: Inputs.Args): object => {
       images: inputs.images,
     };
   }
-  const more: {details_url?: string} = {};
+  const more: {details_url?: string; conclusion?: string; status?: string} = {};
   if (inputs.conclusion === Inputs.Conclusion.ActionRequired || inputs.actions) {
     more.details_url = inputs.actionURL;
   }
+  if (inputs.conclusion) more.conclusion = inputs.conclusion.toString();
+  if (inputs.status) more.status = inputs.status.toString();
   return {
-    status: inputs.status.toString(),
-    conclusion: inputs.conclusion.toString(),
     output,
     actions: inputs.actions,
     ...more,

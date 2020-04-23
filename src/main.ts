@@ -19,25 +19,20 @@ async function run(): Promise<void> {
     };
     const sha = github.context.sha;
 
-    switch (inputs.status) {
-      case 'in_progress':
-      case 'queued': {
+    const completed = inputs.status == 'completed' || inputs.conclusion;
+    if (completed) {
+      const id = core.getState(stateID);
+      if (id) {
+        core.debug(`Updating a Run (${id})`);
+        updateRun(octokit, parseInt(id), ownership, inputs);
+      } else {
         core.debug(`Creating a new Run`);
-        const id = await createRun(octokit, sha, ownership, inputs, {completed: false});
-        core.saveState(stateID, id.toString());
-        break;
+        createRun(octokit, sha, ownership, inputs);
       }
-      case 'completed': {
-        const id = core.getState(stateID);
-        if (id) {
-          core.debug(`Updating a Run (${id})`);
-          updateRun(octokit, parseInt(id), ownership, inputs);
-        } else {
-          core.debug(`Creating a new Run`);
-          createRun(octokit, sha, ownership, inputs);
-        }
-        break;
-      }
+    } else {
+      core.debug(`Creating a new Run`);
+      const id = await createRun(octokit, sha, ownership, inputs, {completed: false});
+      core.saveState(stateID, id.toString());
     }
     core.debug(`Done`);
   } catch (error) {
